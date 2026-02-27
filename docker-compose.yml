@@ -1,0 +1,12 @@
+# WireMock faz exatamente o papel de mockar HTTP ✅
+# Ele é um mock server HTTP. Ou seja:
+# Ele finge ser uma API externa real
+# mas roda localmente e retorna respostas controladas por você
+services:
+  rapidexapi:
+    image: wiremock/wiremock:3x
+    ports:
+      - "8780:8080"
+    volumes:
+      - ./etc/wiremock:home/wiremock/mappings
+    command: --verbose
