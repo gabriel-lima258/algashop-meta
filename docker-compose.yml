@@ -8,5 +8,5 @@ services:
     ports:
       - "8780:8080"
     volumes:
-      - ./etc/wiremock:home/wiremock/mappings
-    command: --verbose
+      - ./etc/wiremock:/home/wiremock/mappings
+    command: --verbose --disable-http2-plain
