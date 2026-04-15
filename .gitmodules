@@ -10,3 +10,6 @@
 [submodule "microservices/product-catalog"]
 	path = microservices/product-catalog
 	url = https://github.com/gabriel-lima258/algashop-product-catalog.git
+[submodule "template"]
+	path = template
+	url = https://github.com/gabriel-lima258/algashop-template-inicial.git
