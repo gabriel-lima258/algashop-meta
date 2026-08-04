@@ -1,12 +1,168 @@
 # algashop-meta
 
-## Adicionando submodules
+E-commerce em microsserviços com **Java 25 + Spring Boot 4**, construído como projeto de estudo de arquitetura de software.
+
+Este repositório não contém código: ele **agrega os seis repositórios** do projeto como submódulos Git, e guarda a infraestrutura local compartilhada por todos.
+
+---
+
+## Os repositórios
+
+| Repositório | Papel |
+|---|---|
+| [`algashop-ordering`](https://github.com/gabriel-lima258/algashop-ordering) | Pedidos, carrinho e checkout — DDD tático com arquitetura hexagonal |
+| [`algashop-billing`](https://github.com/gabriel-lima258/algashop-billing) | Faturamento e integração com gateway de pagamento |
+| [`algashop-product-catalog`](https://github.com/gabriel-lima258/algashop-product-catalog) | Catálogo de produtos e categorias, em MongoDB |
+| [`algashop-billing-scheduler`](https://github.com/gabriel-lima258/algashop-billing-scheduler) | Job que cancela faturas vencidas |
+| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 22 documentos sobre o que foi aplicado e por quê |
+| [`algashop-template-inicial`](https://github.com/gabriel-lima258/algashop-template-inicial) | Esqueleto para começar um serviço novo |
+
+> **Comece pelo [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).** Cada documento registra um conceito, o problema que ele resolve, o código real onde aparece e as armadilhas encontradas — inclusive as que continuam abertas.
+
+---
+
+## Clonando
+
+```bash
+git clone --recurse-submodules https://github.com/gabriel-lima258/algashop-meta.git
+cd algashop-meta
+```
+
+Se já clonou sem os submódulos (as pastas aparecem vazias):
+
+```bash
+git submodule update --init --recursive
+```
 
 ```
-git submodule add link-clone microservices/nome-pasta
+algashop-meta/
+├── docs/                              → algashop-docs
+├── template/                          → algashop-template-inicial
+├── etc/                               configuração da infraestrutura local
+├── docker-compose.tools.yml           bancos e serviços de apoio
+├── docker-compose.services.yml        os microsserviços empacotados
+└── microservices/
+    ├── algashop-ordering/
+    ├── algashop-billing/
+    ├── billing-scheduler/
+    └── product-catalog/
 ```
 
-// seta na main branch
+---
+
+## Subindo a infraestrutura
+
+Há dois arquivos de composição, com papéis distintos:
+
+| Arquivo | Contém |
+|---|---|
+| `docker-compose.tools.yml` | bancos e serviços de apoio — **é o que se usa no dia a dia** |
+| `docker-compose.services.yml` | os microsserviços em container (inclui o `tools`) |
+
+### Desenvolvimento — o caso comum
+
+Sobe só a infraestrutura; os serviços você roda pela IDE ou por `./gradlew bootRun`:
+
+```bash
+docker compose -f docker-compose.tools.yml up -d
 ```
-git submodule set-branch -b main microservices/nome
+
+| Serviço | Porta | O que é |
+|---|---|---|
+| PostgreSQL | **5433** | bancos de `ordering` e `billing` |
+| MongoDB nó 1 | **27017** | primário do replica set `rs0` |
+| MongoDB nó 2 | **27018** | secundário |
+| MongoDB nó 3 | **27019** | secundário |
+| WireMock | **8787** | finge ser as APIs externas |
+| FastPay | **9995** | gateway de pagamento simulado |
+
+E as portas dos serviços, quando você os sobe:
+
+| Serviço | Porta |
+|---|---|
+| `algashop-ordering` | 8081 |
+| `algashop-billing` | 8082 |
+| `product-catalog` | 8083 |
+| `billing-scheduler` | — (não expõe HTTP) |
+
+> ⚠️ **A porta 5433 não é engano.** O Postgres é exposto em `5433` no host justamente para não conflitar com uma instalação nativa, que ocupa a `5432`. Dentro da rede Docker os containers continuam falando na `5432`.
+
+### Um passo a mais para o MongoDB
+
+Os três nós se anunciam no replica set pelos nomes internos do Docker. Como as aplicações rodam **fora** dessa rede, sua máquina precisa saber resolvê-los — acrescente ao arquivo `hosts`:
+
 ```
+127.0.0.1       algashop-mongodb-1
+127.0.0.1       algashop-mongodb-2
+127.0.0.1       algashop-mongodb-3
+```
+
+O conteúdo está em `etc/hostnames/hostnames`, e o passo a passo por sistema operacional em `etc/hostnames/editando-arquivo-hosts.md`.
+
+### Comandos úteis
+
+```bash
+docker compose -f docker-compose.tools.yml ps
+docker compose -f docker-compose.tools.yml logs algashop-mongodb-init
+docker compose -f docker-compose.tools.yml down       # para, mantendo os dados
+docker compose -f docker-compose.tools.yml down -v    # para E APAGA os volumes
+```
+
+---
+
+## A pasta `etc/`
+
+| Pasta | O que faz |
+|---|---|
+| `etc/postgres/` | `init-user-db.sh`, que cria os cinco bancos na primeira subida do volume |
+| `etc/wiremock/` | respostas fixas para as APIs externas — catálogo, FastPay e Rapidex |
+| `etc/stub-runner/` | alternativa ao WireMock: consome os stubs gerados pelos contract tests do `product-catalog` |
+| `etc/hostnames/` | as entradas de `hosts` do cluster MongoDB, e como editá-las em cada sistema |
+
+O diretório do WireMock é montado como volume, então **editar um JSON e reiniciar o container** já aplica a mudança.
+
+---
+
+## Trabalhando com os submódulos
+
+| Situação | Comando |
+|---|---|
+| Ver o estado de todos de uma vez | `git submodule foreach 'git status --short'` |
+| Puxar as atualizações de todos | `git submodule update --remote --merge` |
+| Adicionar um submódulo novo | `git submodule add <url> microservices/<nome>` |
+| Fixar o submódulo numa branch | `git submodule set-branch -b main microservices/<nome>` |
+
+> ⚠️ **Cuidado com `git submodule update` sem `--remote`.** Ele joga o submódulo no commit registrado aqui e **descarta trabalho local não commitado**. Cheque o status antes, sempre.
+
+### Commitar é sempre em duas etapas
+
+O repositório meta guarda apenas um **ponteiro** — o SHA do commit de cada submódulo. Alterar o código de um serviço exige commitar duas vezes:
+
+```bash
+cd microservices/product-catalog
+git commit -m "feat: ..."
+git push
+
+cd ../..
+git add microservices/product-catalog
+git commit -m "chore: atualizar submodulo product-catalog"
+git push
+```
+
+Esquecer a segunda etapa é o erro mais comum do fluxo: o código está no GitHub, e quem clonar o meta continua recebendo a versão antiga.
+
+---
+
+## Por onde começar a estudar
+
+1. [Arquitetura](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/arquitetura.md) — o mapa dos serviços e como conversam
+2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 14 fases, e por que nessa ordem
+3. [Ambiente local](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/ambiente-local.md) — do clone aos serviços rodando, com os problemas comuns
+
+O índice completo dos 22 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
+
+---
+
+## Stack
+
+**Java 25** · **Spring Boot 4.0** · Spring Data JPA · Spring Data MongoDB · PostgreSQL 17 · MongoDB 8 em replica set · Flyway · Gradle 9 · Spring Cloud Contract · WireMock · Testcontainers · JUnit 5 · AssertJ · ModelMapper · Lombok · Docker Compose
