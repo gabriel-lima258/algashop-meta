@@ -10,11 +10,11 @@ Este repositório não contém código: ele **agrega os seis repositórios** do 
 
 | Repositório | Papel |
 |---|---|
-| [`algashop-ordering`](https://github.com/gabriel-lima258/algashop-ordering) | Pedidos, carrinho e checkout — DDD tático com arquitetura hexagonal |
+| [`algashop-ordering`](https://github.com/gabriel-lima258/algashop-ordering) | Pedidos, carrinho e checkout — DDD tático, hexagonal e cache client-side |
 | [`algashop-billing`](https://github.com/gabriel-lima258/algashop-billing) | Faturamento e integração com gateway de pagamento |
-| [`algashop-product-catalog`](https://github.com/gabriel-lima258/algashop-product-catalog) | Catálogo de produtos e categorias, em MongoDB |
+| [`algashop-product-catalog`](https://github.com/gabriel-lima258/algashop-product-catalog) | Catálogo de produtos e categorias, em MongoDB, com cache server-side |
 | [`algashop-billing-scheduler`](https://github.com/gabriel-lima258/algashop-billing-scheduler) | Job que cancela faturas vencidas |
-| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 22 documentos sobre o que foi aplicado e por quê |
+| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 24 documentos sobre o que foi aplicado e por quê |
 | [`algashop-template-inicial`](https://github.com/gabriel-lima258/algashop-template-inicial) | Esqueleto para começar um serviço novo |
 
 > **Comece pelo [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).** Cada documento registra um conceito, o problema que ele resolve, o código real onde aparece e as armadilhas encontradas — inclusive as que continuam abertas.
@@ -73,6 +73,7 @@ docker compose -f docker-compose.tools.yml up -d
 | MongoDB nó 1 | **27017** | primário do replica set `rs0` |
 | MongoDB nó 2 | **27018** | secundário |
 | MongoDB nó 3 | **27019** | secundário |
+| Redis | **6379** | cache do catálogo (db 0) e do `ordering` (db 1) |
 | WireMock | **8787** | finge ser as APIs externas |
 | FastPay | **9995** | gateway de pagamento simulado |
 
@@ -86,6 +87,8 @@ E as portas dos serviços, quando você os sobe:
 | `billing-scheduler` | — (não expõe HTTP) |
 
 > ⚠️ **A porta 5433 não é engano.** O Postgres é exposto em `5433` no host justamente para não conflitar com uma instalação nativa, que ocupa a `5432`. Dentro da rede Docker os containers continuam falando na `5432`.
+
+> ⚠️ **O `.env` na raiz é obrigatório.** É de lá que o Compose lê `REDIS_PASSWORD` para montar o `--requirepass` do Redis. Sem ele, a variável vira string vazia, o Redis sobe **sem senha**, e as aplicações são recusadas — com o agravante de que nada quebra: o serviço responde certo, sempre indo ao banco.
 
 ### Um passo a mais para o MongoDB
 
@@ -156,13 +159,13 @@ Esquecer a segunda etapa é o erro mais comum do fluxo: o código está no GitHu
 ## Por onde começar a estudar
 
 1. [Arquitetura](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/arquitetura.md) — o mapa dos serviços e como conversam
-2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 14 fases, e por que nessa ordem
+2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 15 fases, e por que nessa ordem
 3. [Ambiente local](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/ambiente-local.md) — do clone aos serviços rodando, com os problemas comuns
 
-O índice completo dos 22 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
+O índice completo dos 24 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
 
 ---
 
 ## Stack
 
-**Java 25** · **Spring Boot 4.0** · Spring Data JPA · Spring Data MongoDB · PostgreSQL 17 · MongoDB 8 em replica set · Flyway · Gradle 9 · Spring Cloud Contract · WireMock · Testcontainers · JUnit 5 · AssertJ · ModelMapper · Lombok · Docker Compose
+**Java 25** · **Spring Boot 4.0** · Spring Data JPA · Spring Data MongoDB · PostgreSQL 17 · MongoDB 8 em replica set · Redis 8 · Flyway · Gradle 9 · Spring Cloud Contract · WireMock · Testcontainers · JUnit 5 · AssertJ · ModelMapper · Lombok · Docker Compose
