@@ -2,10 +2,26 @@ include:
   - docker-compose.tools.yml
 services:
   algashop-ordering:
-    image: algashop/ordering:dev
+    image: gabriel58221/ordering:dev
     restart: no
     ports:
       - 8081:8081
+    depends_on:
+      algashop-postgres:
+        condition: service_healthy
+      algashop-redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+  algashop-billing:
+    image: gabriel58221/billing:dev
+    restart: no
+    ports:
+      - 8082:8082
     depends_on:
       algashop-postgres:
         condition: service_healthy
@@ -15,13 +31,18 @@ services:
           memory: 256M
     environment:
       SPRING_PROFILES_ACTIVE: docker
-  algashop-billing:
-    image: algashop/billing:dev
+  algashop-product-catalog:
+    image: gabriel58221/product-catalog:dev
     restart: no
     ports:
-      - 8082:8082
+      - 8083:8083
+    # A espera e pelo algashop-mongodb-init, nao pelos nos: sao os nos que ficam
+    # healthy primeiro, mas o replica set so existe depois que o init roda o
+    # rs.initiate(). Subir antes disso e conectar num cluster ainda nao formado.
     depends_on:
-      algashop-postgres:
+      algashop-mongodb-init:
+        condition: service_completed_successfully
+      algashop-redis:
         condition: service_healthy
     deploy:
       resources:
