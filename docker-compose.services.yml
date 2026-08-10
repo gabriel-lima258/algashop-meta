@@ -14,9 +14,28 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          # 512M, nao 256M: com 256M o container morre de OOM (exit 137) por volta
+          # de 1600 req/s no /api/v1/orders - medido, nao estimado. O limite de
+          # memoria batia ANTES do limite de threads, e mascarava o que este
+          # ambiente existe para medir.
+          memory: 512M
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      # As duas linhas abaixo existem para o TESTE DE CARGA, e sao o par que se
+      # compara em etc/k6.
+      #
+      # 10 threads no Tomcat (o default e 200) e deliberadamente pouco: sem apertar
+      # isso, uma maquina de desenvolvimento nao chega perto de um gargalo e o teste
+      # de carga nao mede nada. Com 10, o teto aparece em segundos.
+      #
+      # ATENCAO: ligar spring.threads.virtual.enabled faz o Tomcat trocar o pool por
+      # um executor de threads virtuais, e server.tomcat.threads.max passa a ser
+      # IGNORADO - a linha continua ali, sem efeito nenhum. Nao ha aviso.
+      #
+      # Para virar a chave sem editar este arquivo:
+      #   VIRTUAL_THREADS=true docker compose up -d --force-recreate algashop-ordering
+      SERVER_TOMCAT_THREADS_MAX: ${TOMCAT_THREADS_MAX:-10}
+      SPRING_THREADS_VIRTUAL_ENABLED: ${VIRTUAL_THREADS:-false}
   algashop-billing:
     image: gabriel58221/billing:dev
     restart: no
@@ -25,6 +44,25 @@ services:
     depends_on:
       algashop-postgres:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+  # Short-lived: e um ApplicationRunner sem Tomcat (excluido no build.gradle), entao
+  # sobe, cancela as faturas vencidas e ENCERRA com codigo 0. Sair nao e falha - por
+  # isso restart: no, e por isso nao ha ports:. Em producao quem o reexecuta e um
+  # CronJob; aqui, um "docker compose up algashop-billing-scheduler" quando quiser.
+  algashop-billing-scheduler:
+    image: gabriel58221/billing-scheduler:dev
+    restart: no
+    depends_on:
+      algashop-postgres:
+        condition: service_healthy
+      # service_started, nao service_healthy: o fastpay nao declara healthcheck.
+      fastpay:
+        condition: service_started
     deploy:
       resources:
         limits:
@@ -47,6 +85,6 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 512M
     environment:
       SPRING_PROFILES_ACTIVE: docker

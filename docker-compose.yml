@@ -1,2 +1,7 @@
+# A cadeia e em dois saltos: este arquivo inclui os servicos, e o de servicos
+# inclui as tools (Postgres, Mongo, Redis, WireMock, Fastpay). Incluir as duas
+# coisas aqui seria erro - o Compose reclama de servico declarado duas vezes.
+# Para subir so a infraestrutura, sem os quatro servicos:
+#   docker compose -f docker-compose.tools.yml up -d
 include:
-  - docker-compose.tools.yml
+  - docker-compose.services.yml

@@ -14,7 +14,7 @@ Este repositório não contém código: ele **agrega os seis repositórios** do 
 | [`algashop-billing`](https://github.com/gabriel-lima258/algashop-billing) | Faturamento e integração com gateway de pagamento |
 | [`algashop-product-catalog`](https://github.com/gabriel-lima258/algashop-product-catalog) | Catálogo de produtos e categorias, em MongoDB, com cache server-side |
 | [`algashop-billing-scheduler`](https://github.com/gabriel-lima258/algashop-billing-scheduler) | Job que cancela faturas vencidas |
-| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 27 documentos sobre o que foi aplicado e por quê |
+| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 29 documentos sobre o que foi aplicado e por quê |
 | [`algashop-template-inicial`](https://github.com/gabriel-lima258/algashop-template-inicial) | Esqueleto para começar um serviço novo |
 
 > **Comece pelo [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).** Cada documento registra um conceito, o problema que ele resolve, o código real onde aparece e as armadilhas encontradas — inclusive as que continuam abertas.
@@ -52,12 +52,17 @@ algashop-meta/
 
 ## Subindo a infraestrutura
 
-Há dois arquivos de composição, com papéis distintos:
+São três arquivos, encadeados por `include` em dois saltos:
+
+```
+docker-compose.yml  ->  docker-compose.services.yml  ->  docker-compose.tools.yml
+```
 
 | Arquivo | Contém |
 |---|---|
 | `docker-compose.tools.yml` | bancos e serviços de apoio — **é o que se usa no dia a dia** |
-| `docker-compose.services.yml` | os microsserviços em container (inclui o `tools`) |
+| `docker-compose.services.yml` | os quatro microsserviços em container (e inclui o `tools`) |
+| `docker-compose.yml` | só o `include` — `docker compose up -d` sobe **tudo** |
 
 ### Desenvolvimento — o caso comum
 
@@ -121,8 +126,32 @@ docker compose -f docker-compose.tools.yml down -v    # para E APAGA os volumes
 | `etc/wiremock/` | respostas fixas para as APIs externas — catálogo, FastPay e Rapidex |
 | `etc/stub-runner/` | alternativa ao WireMock: consome os stubs gerados pelos contract tests do `product-catalog` |
 | `etc/hostnames/` | as entradas de `hosts` do cluster MongoDB, e como editá-las em cada sistema |
+| `etc/k6/` | os testes de carga — smoke, load e volume, contra o catálogo e contra a compra |
 
 O diretório do WireMock é montado como volume, então **editar um JSON e reiniciar o container** já aplica a mudança.
+
+---
+
+## Teste de carga
+
+Precisa do [k6](https://grafana.com/docs/k6/latest/set-up/install-k6/) e do ambiente de pé (`docker compose up -d`):
+
+```bash
+k6 run etc/k6/get-product-loadTest-k6.js
+k6 run etc/k6/buy-now.js
+k6 run -e PROFILE=volume etc/k6/buy-now.js
+```
+
+O `ordering` sobe com o Tomcat limitado a **10 threads** de propósito — sem apertar isso, uma máquina de desenvolvimento não chega perto de um gargalo. Para virar a chave das threads virtuais:
+
+```bash
+VIRTUAL_THREADS=true docker compose up -d --force-recreate algashop-ordering
+```
+
+> ⚠️ Sob carga alta essa configuração **trava o serviço de forma permanente** neste projeto — a medição está documentada, com thread dump e números.
+
+- [Testes de carga com k6](https://github.com/gabriel-lima258/algashop-docs/blob/main/03-testes-integracao/testes-de-carga-k6.md)
+- [Threads e concorrência](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/threads-e-concorrencia.md)
 
 ---
 
@@ -159,10 +188,10 @@ Esquecer a segunda etapa é o erro mais comum do fluxo: o código está no GitHu
 ## Por onde começar a estudar
 
 1. [Arquitetura](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/arquitetura.md) — o mapa dos serviços e como conversam
-2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 17 fases, e por que nessa ordem
+2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 18 fases, e por que nessa ordem
 3. [Ambiente local](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/ambiente-local.md) — do clone aos serviços rodando, com os problemas comuns
 
-O índice completo dos 27 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
+O índice completo dos 29 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
 
 ---
 
