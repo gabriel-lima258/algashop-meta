@@ -34,6 +34,12 @@ Se já clonou sem os submódulos (as pastas aparecem vazias):
 git submodule update --init --recursive
 ```
 
+## Adicionando submodulos ao meta
+
+```bash
+git submodule add https://github.com/gabriel-lima258/algashop-authorization-server.git microservices/authorization-server
+```
+
 ```
 algashop-meta/
 ├── docs/                              → algashop-docs

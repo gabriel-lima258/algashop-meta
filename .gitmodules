@@ -22,3 +22,6 @@
 	path = microservices/billing-scheduler
 	url = https://github.com/gabriel-lima258/algashop-billing-scheduler.git
 	branch = main
+[submodule "microservices/authorization-server"]
+	path = microservices/authorization-server
+	url = https://github.com/gabriel-lima258/algashop-authorization-server.git
