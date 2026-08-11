@@ -14,7 +14,7 @@ Este repositório não contém código: ele **agrega os seis repositórios** do 
 | [`algashop-billing`](https://github.com/gabriel-lima258/algashop-billing) | Faturamento e integração com gateway de pagamento |
 | [`algashop-product-catalog`](https://github.com/gabriel-lima258/algashop-product-catalog) | Catálogo de produtos e categorias, em MongoDB, com cache server-side |
 | [`algashop-billing-scheduler`](https://github.com/gabriel-lima258/algashop-billing-scheduler) | Job que cancela faturas vencidas |
-| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 29 documentos sobre o que foi aplicado e por quê |
+| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 30 documentos sobre o que foi aplicado e por quê |
 | [`algashop-template-inicial`](https://github.com/gabriel-lima258/algashop-template-inicial) | Esqueleto para começar um serviço novo |
 
 > **Comece pelo [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).** Cada documento registra um conceito, o problema que ele resolve, o código real onde aparece e as armadilhas encontradas — inclusive as que continuam abertas.
@@ -80,6 +80,7 @@ docker compose -f docker-compose.tools.yml up -d
 | MongoDB nó 3 | **27019** | secundário |
 | Redis | **6379** | cache do catálogo (db 0) e do `ordering` (db 1) |
 | WireMock | **8787** | finge ser as APIs externas |
+| LocalStack | **4566** | a AWS emulada — só S3, bucket `algashop-product-image` |
 | FastPay | **9995** | gateway de pagamento simulado |
 
 E as portas dos serviços, quando você os sobe:
@@ -105,6 +106,8 @@ Os três nós se anunciam no replica set pelos nomes internos do Docker. Como as
 127.0.0.1       algashop-mongodb-3
 ```
 
+O mesmo arquivo traz três linhas para o LocalStack, e elas **não são opcionais**: a URL pré-assinada que o catálogo devolve aponta para `algashop-localstack:4566` e é usada **pelo navegador**, que precisa resolver o mesmo nome que o servidor usou para assinar.
+
 O conteúdo está em `etc/hostnames/hostnames`, e o passo a passo por sistema operacional em `etc/hostnames/editando-arquivo-hosts.md`.
 
 ### Comandos úteis
@@ -127,6 +130,8 @@ docker compose -f docker-compose.tools.yml down -v    # para E APAGA os volumes
 | `etc/stub-runner/` | alternativa ao WireMock: consome os stubs gerados pelos contract tests do `product-catalog` |
 | `etc/hostnames/` | as entradas de `hosts` do cluster MongoDB, e como editá-las em cada sistema |
 | `etc/k6/` | os testes de carga — smoke, load e volume, contra o catálogo e contra a compra |
+| `etc/aws/` | `init.sh` e `cors.json` — criam o bucket, aplicam o CORS e carregam as imagens no LocalStack |
+| `etc/images/` | as imagens de exemplo sincronizadas para o bucket na subida |
 
 O diretório do WireMock é montado como volume, então **editar um JSON e reiniciar o container** já aplica a mudança.
 
@@ -188,10 +193,10 @@ Esquecer a segunda etapa é o erro mais comum do fluxo: o código está no GitHu
 ## Por onde começar a estudar
 
 1. [Arquitetura](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/arquitetura.md) — o mapa dos serviços e como conversam
-2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 18 fases, e por que nessa ordem
+2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 19 fases, e por que nessa ordem
 3. [Ambiente local](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/ambiente-local.md) — do clone aos serviços rodando, com os problemas comuns
 
-O índice completo dos 29 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
+O índice completo dos 30 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
 
 ---
 

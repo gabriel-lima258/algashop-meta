@@ -160,6 +160,43 @@ services:
           memory: 512M
     environment:
       REDIS_PASSWORD: algashop
+
+  # LocalStack: a AWS emulada, para nao depender de conta nem de rede em desenvolvimento.
+  #
+  # O nome do servico importa mais do que parece. A URL pre-assinada que o catalogo gera
+  # carrega o endpoint configurado - "http://algashop-localstack:4566/..." - e ela vai
+  # para o NAVEGADOR, que precisa resolver esse nome. Por isso as tres linhas novas em
+  # etc/hostnames/hostnames apontando o nome para 127.0.0.1. Em producao isso some: o
+  # endpoint passa a ser o da AWS de verdade, que a internet ja resolve.
+  algashop-localstack:
+    image: localstack/localstack:4.13.1
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+      - "4510-4559:4510-4559"  # External services port range
+    environment:
+      DEBUG: 1 # ativa o debug
+      SERVICES: s3 # ativa o serviço S3
+      LS_ACCESS_KEY_ID: LSIAQAAAAAAVNCBMPNSG
+      LS_SECRET_ACCESS_KEY: test
+      LS_REGION: us-east-1
+    healthcheck:
+      test: curl --location 'http://localhost:4566/_localstack/health'
+      interval: 5s
+      timeout: 10s
+      start_period: 10s
+    volumes:
+      # ready.d: tudo que estiver aqui roda automaticamente quando os servicos ficam
+      # prontos. E o que cria o bucket, aplica o CORS e carrega as imagens de exemplo,
+      # sem nenhum passo manual depois do "docker compose up".
+      - ./etc/aws/init.sh:/etc/localstack/init/ready.d/init-aws.sh
+      - ./etc/aws:/etc/aws
+      - ./etc/images:/etc/images
+    deploy:
+      resources:
+        limits:
+          # 1G, o dobro dos demais servicos de apoio: o s3 sync inicial das imagens ja
+          # derrubou o container por OOM uma vez (ver o comentario no init.sh)
+          memory: 1G
 volumes:
   algashop-postgres:
   algashop-mongodb-1:
