@@ -10,3 +10,5 @@
 # iss de todo token, e o resource server compara - por isso o nome tem que resolver
 # na maquina de quem desenvolve, nao so dentro da rede do compose.
 127.0.0.1 algashop-authorization-server
+
+127.0.0.1 algashop-ecommerce
