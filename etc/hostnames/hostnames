@@ -9,6 +9,20 @@
 # O issuer configurado nos resource servers e este nome. Ele vai dentro do claim
 # iss de todo token, e o resource server compara - por isso o nome tem que resolver
 # na maquina de quem desenvolve, nao so dentro da rede do compose.
+#
+# Dentro da rede do compose quem responde por auth.algashop.local e o hostname do
+# container do authorization server (o DNS embutido do Docker resolve hostname entre
+# containers). Aqui fora, quem responde e esta linha - e ela precisa existir tambem
+# para o NAVEGADOR, que e quem visita /login e /oauth2/authorize.
+127.0.0.1 auth.algashop.local
 127.0.0.1 algashop-authorization-server
 
+# Os tres nomes ficam sob o MESMO dominio-pai (algashop.local) de proposito, e nao por
+# estetica: o cookie de sessao do authorization server e emitido com Domain=algashop.local
+# (ver CookieConfig), e cookie so e compartilhado entre hosts que tenham um pai comum.
+# Os nomes antigos - algashop-authorization-server e algashop-ecommerce - nao tinham pai
+# nenhum, entao o iframe do silent refresh chegaria ao /oauth2/authorize SEM sessao e o
+# fluxo devolveria login_required para sempre.
+127.0.0.1 algashop.local
+127.0.0.1 admin.algashop.local
 127.0.0.1 algashop-ecommerce
