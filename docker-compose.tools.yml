@@ -197,6 +197,17 @@ services:
           # 1G, o dobro dos demais servicos de apoio: o s3 sync inicial das imagens ja
           # derrubou o container por OOM uma vez (ver o comentario no init.sh)
           memory: 1G
+  # Serviço de email ficticio, ideal para testes local
+  algashop-mailpit:
+    image: axllent/mailpit:v1.29
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: no
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 volumes:
   algashop-postgres:
   algashop-mongodb-1:
