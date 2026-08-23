@@ -11,6 +11,9 @@ services:
         condition: service_healthy
       algashop-redis:
         condition: service_healthy
+      # config.import da AWS: sem o localstack pronto, o servico nem sobe.
+      algashop-localstack:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -44,6 +47,8 @@ services:
     depends_on:
       algashop-postgres:
         condition: service_healthy
+      algashop-localstack:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -63,6 +68,8 @@ services:
       # service_started, nao service_healthy: o fastpay nao declara healthcheck.
       fastpay:
         condition: service_started
+      algashop-localstack:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -82,6 +89,8 @@ services:
         condition: service_completed_successfully
       algashop-redis:
         condition: service_healthy
+      algashop-localstack:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -96,6 +105,8 @@ services:
       - 9000:9000
     depends_on:
       algashop-postgres:
+        condition: service_healthy
+      algashop-localstack:
         condition: service_healthy
     deploy:
       resources:
