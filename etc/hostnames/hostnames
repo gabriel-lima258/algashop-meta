@@ -14,3 +14,5 @@
 127.0.0.1 auth.algashop.local
 
 127.0.0.1 algashop-postgres
+
+127.0.0.1 algashop-service-registry
