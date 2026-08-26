@@ -2,7 +2,7 @@
 
 E-commerce em microsserviços com **Java 25 + Spring Boot 4**, construído como projeto de estudo de arquitetura de software.
 
-Este repositório não contém código: ele **agrega os seis repositórios** do projeto como submódulos Git, e guarda a infraestrutura local compartilhada por todos.
+Este repositório não contém código: ele **agrega os nove repositórios** do projeto como submódulos Git, e guarda a infraestrutura local compartilhada por todos.
 
 ---
 
@@ -14,8 +14,10 @@ Este repositório não contém código: ele **agrega os seis repositórios** do 
 | [`algashop-billing`](https://github.com/gabriel-lima258/algashop-billing) | Faturamento e integração com gateway de pagamento |
 | [`algashop-product-catalog`](https://github.com/gabriel-lima258/algashop-product-catalog) | Catálogo de produtos e categorias, em MongoDB, com cache server-side |
 | [`algashop-billing-scheduler`](https://github.com/gabriel-lima258/algashop-billing-scheduler) | Job que cancela faturas vencidas |
-| [`algashop-authorization-server`](https://github.com/gabriel-lima258/algashop-authorization-server) | Emite os tokens OAuth 2.1 — o único serviço sem domínio de negócio |
-| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 32 documentos sobre o que foi aplicado e por quê |
+| [`algashop-authorization-server`](https://github.com/gabriel-lima258/algashop-authorization-server) | Emite os tokens OAuth 2.1 e gerencia usuários |
+| [`algashop-service-registry`](https://github.com/gabriel-lima258/algashop-service-registry) | Eureka Server — registro e descoberta de serviços |
+| [`algashop-api-gateway`](https://github.com/gabriel-lima258/algashop-api-gateway) | Spring Cloud Gateway — porta única de entrada, rotas por service ID e token na borda |
+| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 48 documentos sobre o que foi aplicado e por quê |
 | [`algashop-template-inicial`](https://github.com/gabriel-lima258/algashop-template-inicial) | Esqueleto para começar um serviço novo |
 
 > **Comece pelo [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).** Cada documento registra um conceito, o problema que ele resolve, o código real onde aparece e as armadilhas encontradas — inclusive as que continuam abertas.
@@ -87,17 +89,19 @@ docker compose -f docker-compose.tools.yml up -d
 | MongoDB nó 3 | **27019** | secundário |
 | Redis | **6379** | cache do catálogo (db 0) e do `ordering` (db 1) |
 | WireMock | **8787** | finge ser as APIs externas |
-| LocalStack | **4566** | a AWS emulada — só S3, bucket `algashop-product-image` |
+| LocalStack | **4566** | a AWS emulada — S3, Secrets Manager e Parameter Store (config e segredos dos serviços) |
 | FastPay | **9995** | gateway de pagamento simulado |
 
 E as portas dos serviços, quando você os sobe:
 
 | Serviço | Porta |
 |---|---|
+| `api-gateway` | **9999** — a porta única de entrada |
 | `algashop-ordering` | 8081 |
-| `authorization-server` | 9000 — **fora do compose**, sobe por `./gradlew bootRun` |
 | `algashop-billing` | 8082 |
 | `product-catalog` | 8083 |
+| `authorization-server` | 9000 — no compose desde a Fase 26, responde por `auth.algashop.local` |
+| `service-registry` | 8761 — dashboard Eureka |
 | `billing-scheduler` | — (não expõe HTTP) |
 
 > ⚠️ **A porta 5433 não é engano.** O Postgres é exposto em `5433` no host justamente para não conflitar com uma instalação nativa, que ocupa a `5432`. Dentro da rede Docker os containers continuam falando na `5432`.
