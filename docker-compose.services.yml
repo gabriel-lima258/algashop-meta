@@ -159,6 +159,10 @@ services:
       # healthcheck no compose.
       algashop-authorization-server:
         condition: service_started
+      # os contadores do rate limiter moram no Redis; sem ele o filtro falha
+      # ABERTO (deixa passar sem limitar) - em silencio. Melhor esperar.
+      algashop-redis:
+        condition: service_healthy
     # bash + /dev/tcp em vez de curl: a imagem temurin-jre nao traz curl/wget.
     healthcheck:
       test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/9999"]
