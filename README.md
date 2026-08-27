@@ -16,7 +16,7 @@ Este repositório não contém código: ele **agrega os nove repositórios** do 
 | [`algashop-billing-scheduler`](https://github.com/gabriel-lima258/algashop-billing-scheduler) | Job que cancela faturas vencidas |
 | [`algashop-authorization-server`](https://github.com/gabriel-lima258/algashop-authorization-server) | Emite os tokens OAuth 2.1 e gerencia usuários |
 | [`algashop-service-registry`](https://github.com/gabriel-lima258/algashop-service-registry) | Eureka Server — registro e descoberta de serviços |
-| [`algashop-api-gateway`](https://github.com/gabriel-lima258/algashop-api-gateway) | Spring Cloud Gateway — porta única de entrada, rotas por service ID, token na borda e resiliência (timeout, retry, circuit breaker, cache local, rate limit) |
+| [`algashop-api-gateway-ecommerce`](https://github.com/gabriel-lima258/algashop-api-gateway-ecommerce) | Spring Cloud Gateway — porta única de entrada, rotas por service ID, token na borda e resiliência (timeout, retry, circuit breaker, cache local, rate limit) |
 | [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 48 documentos sobre o que foi aplicado e por quê |
 | [`algashop-template-inicial`](https://github.com/gabriel-lima258/algashop-template-inicial) | Esqueleto para começar um serviço novo |
 
