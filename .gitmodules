@@ -37,3 +37,9 @@
 	path = microservices/api-gateway-admin
 	url = https://github.com/gabriel-lima258/algashop-api-gateway-admin.git
 	branch = main
+[submodule "apps/ecommerce"]
+	path = apps/ecommerce
+	url = https://github.com/gabriel-lima258/algashop-ecommerce-app.git
+[submodule "apps/admin"]
+	path = apps/admin
+	url = https://github.com/gabriel-lima258/algashop-admin-app.git

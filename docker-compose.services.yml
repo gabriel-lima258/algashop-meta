@@ -55,6 +55,15 @@ services:
         condition: service_healthy
       algashop-service-registry:
         condition: service_healthy
+    # bash + /dev/tcp em vez de curl: a imagem temurin-jre nao traz curl/wget.
+    # Porta aberta = Flyway ja criou o schema (invoice etc.) - e o gate que o
+    # billing-scheduler precisa antes de consultar o banco.
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8082"]
+      interval: 5s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
     deploy:
       resources:
         limits:
@@ -75,6 +84,10 @@ services:
       fastpay:
         condition: service_started
       algashop-localstack:
+        condition: service_healthy
+      # o scheduler consulta a tabela invoice, criada pelo Flyway do billing:
+      # sem esperar o billing healthy, num up frio ele roda contra um schema vazio.
+      algashop-billing:
         condition: service_healthy
     deploy:
       resources:
@@ -118,6 +131,15 @@ services:
         condition: service_healthy
       algashop-service-registry:
         condition: service_healthy
+    # bash + /dev/tcp em vez de curl: a imagem temurin-jre nao traz curl/wget.
+    # Porta aberta = Flyway ja rodou e o Spring subiu: e o gate que os dependentes
+    # (gateways e ecommerce-app, que fazem descoberta OIDC no bootstrap) precisam.
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/9000"]
+      interval: 5s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
     deploy:
       resources:
         limits:
@@ -155,13 +177,15 @@ services:
       algashop-service-registry:
         condition: service_healthy
       # issuer-uri dispara a descoberta OIDC no bootstrap: com o authorization
-      # server fora, o gateway nem sobe. service_started porque o AS nao declara
-      # healthcheck no compose.
+      # server fora, o gateway nem sobe.
       algashop-authorization-server:
-        condition: service_started
+        condition: service_healthy
       # os contadores do rate limiter moram no Redis; sem ele o filtro falha
       # ABERTO (deixa passar sem limitar) - em silencio. Melhor esperar.
       algashop-redis:
+        condition: service_healthy
+      # config.import da AWS: sem o localstack pronto, o servico nem sobe.
+      algashop-localstack:
         condition: service_healthy
     # bash + /dev/tcp em vez de curl: a imagem temurin-jre nao traz curl/wget.
     healthcheck:
@@ -187,13 +211,15 @@ services:
       algashop-service-registry:
         condition: service_healthy
       # issuer-uri dispara a descoberta OIDC no bootstrap: com o authorization
-      # server fora, o gateway nem sobe. service_started porque o AS nao declara
-      # healthcheck no compose.
+      # server fora, o gateway nem sobe.
       algashop-authorization-server:
-        condition: service_started
+        condition: service_healthy
       # os contadores do rate limiter moram no Redis; sem ele o filtro falha
       # ABERTO (deixa passar sem limitar) - em silencio. Melhor esperar.
       algashop-redis:
+        condition: service_healthy
+      # config.import da AWS: sem o localstack pronto, o servico nem sobe.
+      algashop-localstack:
         condition: service_healthy
     # bash + /dev/tcp em vez de curl: a imagem temurin-jre nao traz curl/wget.
     healthcheck:
@@ -202,6 +228,34 @@ services:
       timeout: 5s
       start_period: 20s
       retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+  algashop-admin-app:
+    image: algashop/algashop-admin:dev
+    restart: no
+    ports:
+      - 4200:80
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+  algashop-ecommerce-app:
+    image: algashop/algashop-ecommerce:dev
+    restart: no
+    ports:
+      - 9080:9080
+    depends_on:
+      # issuer-uri do oauth2 client dispara a descoberta OIDC no bootstrap: com o
+      # authorization server fora, o app nem sobe.
+      algashop-authorization-server:
+        condition: service_healthy
+      # sessoes e dados do app moram no Redis; sem ele o boot/uso falha.
+      algashop-redis:
+        condition: service_healthy
     deploy:
       resources:
         limits:

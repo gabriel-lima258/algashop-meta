@@ -180,10 +180,15 @@ services:
       LS_SECRET_ACCESS_KEY: test
       LS_REGION: us-east-1
     healthcheck:
-      test: curl --location 'http://localhost:4566/_localstack/health'
+      # /_localstack/init/ready so devolve "completed": true depois que os scripts de
+      # ready.d (init-aws.sh: parametros, secrets, bucket) terminaram. Sem isso, healthy
+      # significava apenas "porta aberta" e os servicos corriam contra o seed - o
+      # product-catalog chegou a subir antes do secret do redis existir.
+      test: ["CMD-SHELL", "curl -s http://localhost:4566/_localstack/init/ready | grep -q '\"completed\": true'"]
       interval: 5s
       timeout: 10s
-      start_period: 10s
+      start_period: 60s
+      retries: 20
     volumes:
       # ready.d: tudo que estiver aqui roda automaticamente quando os servicos ficam
       # prontos. E o que cria o bucket, aplica o CORS e carrega as imagens de exemplo,

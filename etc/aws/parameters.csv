@@ -29,7 +29,7 @@ name,type,value
 /config/algashop/billing/fastpay/webhook-url,String,http://host.docker.internal:8082/api/v1/webhooks/fastpay
 /config/algashop/ordering/datasource/url,String,jdbc:postgresql://localhost:5433/ordering
 /config/algashop/ordering/jpa/show-sql,String,true
-/config/algashop/ordering/redis/host,String,localhost
+/config/algashop/ordering/redis/host,String,algashop-redis
 /config/algashop/ordering/redis/port,String,6379
 /config/algashop/ordering/redis/database,String,1
 /config/algashop/ordering/redis/timeout,String,600
@@ -38,7 +38,7 @@ name,type,value
 /config/algashop/billing-scheduler/datasource/url,String,jdbc:postgresql://localhost:5433/billing
 /config/algashop/billing-scheduler/fastpay/hostname,String,http://localhost:9995
 /config/algashop/product-catalog/mongodb/uri,String,mongodb://localhost:27017,localhost:27018,localhost:27019/product_catalog?replicaSet=rs0
-/config/algashop/product-catalog/redis/host,String,localhost
+/config/algashop/product-catalog/redis/host,String,algashop-redis
 /config/algashop/product-catalog/redis/port,String,6379
 /config/algashop/product-catalog/redis/database,String,0
 /config/algashop/product-catalog/redis/timeout,String,600
@@ -46,3 +46,14 @@ name,type,value
 /config/algashop/product-catalog/storage/s3/bucket-name,String,algashop-product-image
 /config/algashop/product-catalog/data-load/enabled,String,true
 /config/algashop/product-catalog/data-load/auto-drop,String,true
+/config/algashop/gateway-admin/redis/host,String,algashop-redis
+/config/algashop/gateway-admin/redis/port,String,6379
+/config/algashop/gateway-admin/redis/database,String,5
+/config/algashop/gateway-admin/httpclient/connect-timeout,String,1000
+/config/algashop/gateway-admin/httpclient/response-timeout,String,5000
+/config/algashop/gateway-admin/security/cors/allowedOrigins,StringList,http://admin.algashop.local:4200
+/config/algashop/gateway-ecommerce/redis/host,String,algashop-redis
+/config/algashop/gateway-ecommerce/redis/port,String,6379
+/config/algashop/gateway-ecommerce/redis/database,String,3
+/config/algashop/gateway-ecommerce/httpclient/connect-timeout,String,1000
+/config/algashop/gateway-ecommerce/httpclient/response-timeout,String,5000

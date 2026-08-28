@@ -21,3 +21,5 @@
 127.0.0.1 algashop-redis
 127.0.0.1 fastpay
 127.0.0.1 algashop-service-registry
+
+127.0.0.1 api.algashop.local

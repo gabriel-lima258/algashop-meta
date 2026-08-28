@@ -2,7 +2,7 @@
 
 E-commerce em microsserviços com **Java 25 + Spring Boot 4**, construído como projeto de estudo de arquitetura de software.
 
-Este repositório não contém código: ele **agrega os nove repositórios** do projeto como submódulos Git, e guarda a infraestrutura local compartilhada por todos.
+Este repositório não contém código: ele **agrega os doze repositórios** do projeto como submódulos Git, e guarda a infraestrutura local compartilhada por todos.
 
 ---
 
@@ -16,8 +16,11 @@ Este repositório não contém código: ele **agrega os nove repositórios** do 
 | [`algashop-billing-scheduler`](https://github.com/gabriel-lima258/algashop-billing-scheduler) | Job que cancela faturas vencidas |
 | [`algashop-authorization-server`](https://github.com/gabriel-lima258/algashop-authorization-server) | Emite os tokens OAuth 2.1 e gerencia usuários |
 | [`algashop-service-registry`](https://github.com/gabriel-lima258/algashop-service-registry) | Eureka Server — registro e descoberta de serviços |
-| [`algashop-api-gateway-ecommerce`](https://github.com/gabriel-lima258/algashop-api-gateway-ecommerce) | Spring Cloud Gateway — porta única de entrada, rotas por service ID, token na borda e resiliência (timeout, retry, circuit breaker, cache local, rate limit) |
-| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 48 documentos sobre o que foi aplicado e por quê |
+| [`algashop-api-gateway-ecommerce`](https://github.com/gabriel-lima258/algashop-api-gateway-ecommerce) | Borda do e-commerce (9999) — rotas por service ID, token na borda, cache local, API composition e resiliência |
+| [`algashop-api-gateway-admin`](https://github.com/gabriel-lima258/algashop-api-gateway-admin) | Borda do admin (9998) — CORS da SPA, JSON enxuto na listagem, rate limit |
+| [`algashop-ecommerce-app`](https://github.com/gabriel-lima258/algashop-ecommerce-app) | O BFF — app server-side Spring + Thymeleaf, token em sessão no Redis |
+| [`algashop-admin-app`](https://github.com/gabriel-lima258/algashop-admin-app) | SPA Angular 17 de administração, com PKCE |
+| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 50 documentos sobre o que foi aplicado e por quê |
 | [`algashop-template-inicial`](https://github.com/gabriel-lima258/algashop-template-inicial) | Esqueleto para começar um serviço novo |
 
 > **Comece pelo [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).** Cada documento registra um conceito, o problema que ele resolve, o código real onde aparece e as armadilhas encontradas — inclusive as que continuam abertas.
@@ -96,7 +99,10 @@ E as portas dos serviços, quando você os sobe:
 
 | Serviço | Porta |
 |---|---|
-| `api-gateway` | **9999** — a porta única de entrada |
+| `api-gateway-ecommerce` | **9999** — borda do e-commerce |
+| `api-gateway-admin` | **9998** — borda do admin |
+| `ecommerce-app` | **9080** — o BFF server-side |
+| `admin-app` | **4200** — a SPA (nginx no container) |
 | `algashop-ordering` | 8081 |
 | `algashop-billing` | 8082 |
 | `product-catalog` | 8083 |
@@ -142,7 +148,7 @@ docker compose -f docker-compose.tools.yml down -v    # para E APAGA os volumes
 | `etc/stub-runner/` | alternativa ao WireMock: consome os stubs gerados pelos contract tests do `product-catalog` |
 | `etc/hostnames/` | as entradas de `hosts` do cluster MongoDB, e como editá-las em cada sistema |
 | `etc/k6/` | os testes de carga — smoke, load e volume, contra o catálogo e contra a compra |
-| `etc/aws/` | `init.sh` e `cors.json` — criam o bucket, aplicam o CORS e carregam as imagens no LocalStack |
+| `etc/aws/` | `init.sh` + `parameters.csv`/`secrets.csv` — o seed completo do LocalStack: parâmetros, segredos, chave RSA, bucket, CORS e imagens |
 | `etc/images/` | as imagens de exemplo sincronizadas para o bucket na subida |
 
 O diretório do WireMock é montado como volume, então **editar um JSON e reiniciar o container** já aplica a mudança.
@@ -205,10 +211,10 @@ Esquecer a segunda etapa é o erro mais comum do fluxo: o código está no GitHu
 ## Por onde começar a estudar
 
 1. [Arquitetura](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/arquitetura.md) — o mapa dos serviços e como conversam
-2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 20 fases, e por que nessa ordem
+2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 36 fases, e por que nessa ordem
 3. [Ambiente local](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/ambiente-local.md) — do clone aos serviços rodando, com os problemas comuns
 
-O índice completo dos 32 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
+O índice completo dos 50 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
 
 ---
 
