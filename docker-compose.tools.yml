@@ -213,8 +213,77 @@ services:
       resources:
         limits:
           memory: 256M
+  algashop-kafka-1:
+    image: apache/kafka:4.3.1
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_KRAFT_CLUSTER_ID: "xiLkLerZQXaw45eXNW7qGw" # Identificador do cluster KRaft o formato deve ser id válido
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: controller,broker # Define que o nó atua como controlador e broker
+      KAFKA_LISTENERS: PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9092 # Define os listeners para comunicação interna e externa
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://algashop-kafka-1:9090,EXTERNAL://localhost:9092 # Define os listeners anunciados para comunicação externa
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT # Mapeia os protocolos de segurança para cada listener
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@algashop-kafka-1:9091,2@algashop-kafka-2:9091,3@algashop-kafka-3:9091 # Define os votantes do quórum do controlador
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT # Define o listener para comunicação entre brokers
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER # Define o listener do controlador
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3 # Fator de replicação padrão para tópicos criados
+      KAFKA_LOG_DIRS: /var/lib/kafka/data # Diretório de logs do Kafka
+    volumes:
+      - algashop-kafka-data-1:/var/lib/kafka/data
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+  algashop-kafka-2:
+    image: apache/kafka:4.3.1
+    ports:
+      - 9093:9092
+    environment:
+      KAFKA_KRAFT_CLUSTER_ID: "xiLkLerZQXaw45eXNW7qGw"
+      KAFKA_NODE_ID: 2
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_LISTENERS: PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://algashop-kafka-2:9090,EXTERNAL://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@algashop-kafka-1:9091,2@algashop-kafka-2:9091,3@algashop-kafka-3:9091
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - algashop-kafka-data-2:/var/lib/kafka/data
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+  algashop-kafka-3:
+    image: apache/kafka:4.3.1
+    ports:
+      - 9094:9092
+    environment:
+      KAFKA_KRAFT_CLUSTER_ID: "xiLkLerZQXaw45eXNW7qGw"
+      KAFKA_NODE_ID: 3
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_LISTENERS: PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://algashop-kafka-3:9090,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@algashop-kafka-1:9091,2@algashop-kafka-2:9091,3@algashop-kafka-3:9091
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - algashop-kafka-data-3:/var/lib/kafka/data
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 volumes:
   algashop-postgres:
   algashop-mongodb-1:
   algashop-mongodb-2:
   algashop-mongodb-3:
+  algashop-kafka-data-1:
+  algashop-kafka-data-2:
+  algashop-kafka-data-3:
