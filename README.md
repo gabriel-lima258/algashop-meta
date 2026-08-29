@@ -20,7 +20,7 @@ Este repositório não contém código: ele **agrega os doze repositórios** do 
 | [`algashop-api-gateway-admin`](https://github.com/gabriel-lima258/algashop-api-gateway-admin) | Borda do admin (9998) — CORS da SPA, JSON enxuto na listagem, rate limit |
 | [`algashop-ecommerce-app`](https://github.com/gabriel-lima258/algashop-ecommerce-app) | O BFF — app server-side Spring + Thymeleaf, token em sessão no Redis |
 | [`algashop-admin-app`](https://github.com/gabriel-lima258/algashop-admin-app) | SPA Angular 17 de administração, com PKCE |
-| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 50 documentos sobre o que foi aplicado e por quê |
+| [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs) | **O caderno de estudos** — 51 documentos sobre o que foi aplicado e por quê |
 | [`algashop-template-inicial`](https://github.com/gabriel-lima258/algashop-template-inicial) | Esqueleto para começar um serviço novo |
 
 > **Comece pelo [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).** Cada documento registra um conceito, o problema que ele resolve, o código real onde aparece e as armadilhas encontradas — inclusive as que continuam abertas.
@@ -211,10 +211,10 @@ Esquecer a segunda etapa é o erro mais comum do fluxo: o código está no GitHu
 ## Por onde começar a estudar
 
 1. [Arquitetura](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/arquitetura.md) — o mapa dos serviços e como conversam
-2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 36 fases, e por que nessa ordem
+2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 37 fases, e por que nessa ordem
 3. [Ambiente local](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/ambiente-local.md) — do clone aos serviços rodando, com os problemas comuns
 
-O índice completo dos 50 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
+O índice completo dos 51 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
 
 ---
 
