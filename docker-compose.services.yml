@@ -18,6 +18,14 @@ services:
       # primeiro lookup do @LoadBalanced nao - melhor esperar.
       algashop-service-registry:
         condition: service_healthy
+      # kafka: o listener de eventos do catalogo assina o topico no boot; sem os
+      # brokers o container entra em loop de reconexao logando erro.
+      algashop-kafka-1:
+        condition: service_healthy
+      algashop-kafka-2:
+        condition: service_healthy
+      algashop-kafka-3:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -111,6 +119,14 @@ services:
       algashop-localstack:
         condition: service_healthy
       algashop-service-registry:
+        condition: service_healthy
+      # kafka: o catalogo declara NewTopic com admin.fail-fast=true - sem broker
+      # respondendo, o boot cai. Espera os 3 (min.insync.replicas=2 precisa de quorum).
+      algashop-kafka-1:
+        condition: service_healthy
+      algashop-kafka-2:
+        condition: service_healthy
+      algashop-kafka-3:
         condition: service_healthy
     deploy:
       resources:

@@ -231,6 +231,15 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data # Diretório de logs do Kafka
     volumes:
       - algashop-kafka-data-1:/var/lib/kafka/data
+    # TCP no listener interno 9090 basta como "vivo e escutando"; a imagem apache/kafka
+    # nao traz curl/nc, mas o bash do container abre socket com /dev/tcp.
+    # start_period generoso: 3 nos KRaft precisam eleger quorum antes de atender.
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9090'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     deploy:
       resources:
         limits:
@@ -253,6 +262,12 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
     volumes:
       - algashop-kafka-data-2:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9090'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     deploy:
       resources:
         limits:
@@ -275,10 +290,23 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
     volumes:
       - algashop-kafka-data-3:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9090'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     deploy:
       resources:
         limits:
           memory: 1G
+  algashop-kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    ports:
+      - 9084:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: algashop-kafka-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: algashop-kafka-1:9090,algashop-kafka-2:9090,algashop-kafka-3:9090
 volumes:
   algashop-postgres:
   algashop-mongodb-1:
