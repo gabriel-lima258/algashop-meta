@@ -278,4 +278,7 @@ services:
           memory: 512M
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    extra_hosts:
+      - "auth.algashop.local:host-gateway"
+      - "algashop-api-gateway:host-gateway"
 
