@@ -221,21 +221,21 @@ services:
       KAFKA_KRAFT_CLUSTER_ID: "xiLkLerZQXaw45eXNW7qGw" # Identificador do cluster KRaft o formato deve ser id válido
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: controller,broker # Define que o nó atua como controlador e broker
-      KAFKA_LISTENERS: PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9092 # Define os listeners para comunicação interna e externa
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://algashop-kafka-1:9090,EXTERNAL://localhost:9092 # Define os listeners anunciados para comunicação externa
+      KAFKA_LISTENERS: PLAINTEXT://:9081,CONTROLLER://:9191,EXTERNAL://:9092 # Define os listeners para comunicação interna e externa
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://algashop-kafka-1:9081,EXTERNAL://localhost:9092 # Define os listeners anunciados para comunicação externa
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT # Mapeia os protocolos de segurança para cada listener
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@algashop-kafka-1:9091,2@algashop-kafka-2:9091,3@algashop-kafka-3:9091 # Define os votantes do quórum do controlador
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@algashop-kafka-1:9191,2@algashop-kafka-2:9192,3@algashop-kafka-3:9193 # Define os votantes do quórum do controlador
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT # Define o listener para comunicação entre brokers
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER # Define o listener do controlador
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3 # Fator de replicação padrão para tópicos criados
       KAFKA_LOG_DIRS: /var/lib/kafka/data # Diretório de logs do Kafka
     volumes:
       - algashop-kafka-data-1:/var/lib/kafka/data
-    # TCP no listener interno 9090 basta como "vivo e escutando"; a imagem apache/kafka
+    # TCP no listener interno (9081/9082/9083) basta como "vivo e escutando"; a imagem apache/kafka
     # nao traz curl/nc, mas o bash do container abre socket com /dev/tcp.
     # start_period generoso: 3 nos KRaft precisam eleger quorum antes de atender.
     healthcheck:
-      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9090'"]
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9081'"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -247,15 +247,15 @@ services:
   algashop-kafka-2:
     image: apache/kafka:4.3.1
     ports:
-      - 9093:9092
+      - 9093:9093
     environment:
       KAFKA_KRAFT_CLUSTER_ID: "xiLkLerZQXaw45eXNW7qGw"
       KAFKA_NODE_ID: 2
       KAFKA_PROCESS_ROLES: controller,broker
-      KAFKA_LISTENERS: PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://algashop-kafka-2:9090,EXTERNAL://localhost:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9082,CONTROLLER://:9192,EXTERNAL://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://algashop-kafka-2:9082,EXTERNAL://localhost:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@algashop-kafka-1:9091,2@algashop-kafka-2:9091,3@algashop-kafka-3:9091
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@algashop-kafka-1:9191,2@algashop-kafka-2:9192,3@algashop-kafka-3:9193
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
@@ -263,7 +263,7 @@ services:
     volumes:
       - algashop-kafka-data-2:/var/lib/kafka/data
     healthcheck:
-      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9090'"]
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9082'"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -275,15 +275,15 @@ services:
   algashop-kafka-3:
     image: apache/kafka:4.3.1
     ports:
-      - 9094:9092
+      - 9094:9094
     environment:
       KAFKA_KRAFT_CLUSTER_ID: "xiLkLerZQXaw45eXNW7qGw"
       KAFKA_NODE_ID: 3
       KAFKA_PROCESS_ROLES: controller,broker
-      KAFKA_LISTENERS: PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://algashop-kafka-3:9090,EXTERNAL://localhost:9094
+      KAFKA_LISTENERS: PLAINTEXT://:9083,CONTROLLER://:9193,EXTERNAL://:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://algashop-kafka-3:9083,EXTERNAL://localhost:9094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@algashop-kafka-1:9091,2@algashop-kafka-2:9091,3@algashop-kafka-3:9091
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@algashop-kafka-1:9191,2@algashop-kafka-2:9192,3@algashop-kafka-3:9193
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
@@ -291,7 +291,7 @@ services:
     volumes:
       - algashop-kafka-data-3:/var/lib/kafka/data
     healthcheck:
-      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9090'"]
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9083'"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -306,7 +306,7 @@ services:
       - 9084:8080
     environment:
       KAFKA_CLUSTERS_0_NAME: algashop-kafka-cluster
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: algashop-kafka-1:9090,algashop-kafka-2:9090,algashop-kafka-3:9090
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: algashop-kafka-1:9081,algashop-kafka-2:9082,algashop-kafka-3:9083
 volumes:
   algashop-postgres:
   algashop-mongodb-1:

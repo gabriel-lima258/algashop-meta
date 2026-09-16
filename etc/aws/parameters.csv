@@ -50,10 +50,10 @@ name,type,value
 /config/algashop/gateway-admin/redis/port,String,6379
 /config/algashop/gateway-admin/redis/database,String,5
 /config/algashop/gateway-admin/httpclient/connect-timeout,String,1000
-/config/algashop/gateway-admin/httpclient/response-timeout,String,5000
+/config/algashop/gateway-admin/httpclient/response-timeout,String,60000
 /config/algashop/gateway-admin/security/cors/allowedOrigins,StringList,http://admin.algashop.local:4200
 /config/algashop/gateway-ecommerce/redis/host,String,algashop-redis
 /config/algashop/gateway-ecommerce/redis/port,String,6379
 /config/algashop/gateway-ecommerce/redis/database,String,3
 /config/algashop/gateway-ecommerce/httpclient/connect-timeout,String,1000
-/config/algashop/gateway-ecommerce/httpclient/response-timeout,String,5000
+/config/algashop/gateway-ecommerce/httpclient/response-timeout,String,60000
