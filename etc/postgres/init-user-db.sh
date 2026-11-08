@@ -3,6 +3,8 @@ set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
   CREATE DATABASE fastpay;
+	CREATE DATABASE notifications;
+	CREATE DATABASE notifications_test;
 	CREATE DATABASE ordering;
 	CREATE DATABASE ordering_test;
 	CREATE DATABASE billing;
