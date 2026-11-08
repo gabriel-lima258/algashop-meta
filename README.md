@@ -175,8 +175,8 @@ VIRTUAL_THREADS=true docker compose up -d --force-recreate algashop-ordering
 
 > ⚠️ Sob carga alta essa configuração **trava o serviço de forma permanente** neste projeto — a medição está documentada, com thread dump e números.
 
-- [Testes de carga com k6](https://github.com/gabriel-lima258/algashop-docs/blob/main/03-testes-integracao/testes-de-carga-k6.md)
-- [Threads e concorrência](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/threads-e-concorrencia.md)
+- [Testes de carga com k6](https://github.com/gabriel-lima258/algashop-docs/blob/main/03-testes-integracao/04-testes-de-carga-k6.md)
+- [Threads e concorrência](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/08-threads-e-concorrencia.md)
 
 ---
 
@@ -212,9 +212,9 @@ Esquecer a segunda etapa é o erro mais comum do fluxo: o código está no GitHu
 
 ## Por onde começar a estudar
 
-1. [Arquitetura](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/arquitetura.md) — o mapa dos serviços e como conversam
-2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/linha-do-tempo.md) — a jornada em 41 fases, e por que nessa ordem
-3. [Ambiente local](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/ambiente-local.md) — do clone aos serviços rodando, com os problemas comuns
+1. [Arquitetura](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/01-arquitetura.md) — o mapa dos serviços e como conversam
+2. [Linha do tempo](https://github.com/gabriel-lima258/algashop-docs/blob/main/00-visao-geral/02-linha-do-tempo.md) — a jornada em 41 fases, e por que nessa ordem
+3. [Ambiente local](https://github.com/gabriel-lima258/algashop-docs/blob/main/04-infraestrutura/01-ambiente-local.md) — do clone aos serviços rodando, com os problemas comuns
 
 O índice completo dos 58 documentos está no [`algashop-docs`](https://github.com/gabriel-lima258/algashop-docs).
 
