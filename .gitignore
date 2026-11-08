@@ -41,3 +41,6 @@ out/
 .idea
 
 .env
+### Claude Code (local, nao versionado) ###
+.claude/
+CLAUDE.md
