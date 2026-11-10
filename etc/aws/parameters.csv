@@ -5,6 +5,7 @@ name,type,value
 /config/algashop/authorization-server/clients/algashop-ordering-service/secret,SecureString,{bcrypt}$2a$10$Bf4N926CyjieughTqkgyD.g6yUF7pYHv9kI.ExPRgBauuRj6i/2AC
 /config/algashop/authorization-server/clients/algashop-ecommerce-web/secret,SecureString,{bcrypt}$2a$10$PMQ27hh0lU62uJsZsY49qOEHXAWwJD8KydtaWUwdvy1Ctlf4s87cm
 /config/algashop/authorization-server/clients/algashop-ecommerce-m2m/secret,SecureString,{bcrypt}$2a$10$eZ8iYaqjWIquHUUQolwJWOUDYJrnNdB9w9rjCZbplUDIQZyadPjWu
+/config/algashop/authorization-server/clients/algashop-notifications-service/secret,SecureString,{bcrypt}$2a$12$/LwwXU1HpZS78zlTIJJZL.x4rn.Kdf1LmFbh8w5Miqie2xQoBWtwq
 /config/algashop/authorization-server/mail/host,String,localhost
 /config/algashop/authorization-server/mail/port,String,1025
 /config/algashop/authorization-server/logging/security-level,String,TRACE
