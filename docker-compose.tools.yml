@@ -307,6 +307,34 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: algashop-kafka-cluster
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: algashop-kafka-1:9081,algashop-kafka-2:9082,algashop-kafka-3:9083
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: algashop-connect
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://algashop-kafka-connect:8083 # pelo nome, na rede do Docker (nao pela porta do host)
+  # Kafka Connect para o ETL com CDC dos relatorios (docs/08-relatorios/07 e 08).
+  # Imagem do Debezium: um Kafka Connect que ja traz os plugins de CDC (Postgres, MongoDB...) na pasta de plugins.
+  algashop-kafka-connect:
+    image: quay.io/debezium/connect:3.7.0.Final
+    ports:
+      - 8086:8083 # API REST no host: 8086 (a 8085 e a segunda instancia do notifications)
+    depends_on:
+      - algashop-kafka-1
+      - algashop-kafka-2
+      - algashop-kafka-3
+    environment:
+      BOOTSTRAP_SERVERS: algashop-kafka-1:9081,algashop-kafka-2:9082,algashop-kafka-3:9083 # listeners internos dos brokers
+      GROUP_ID: algashop-kafka-connect # modo distribuido: workers com o mesmo id formam um cluster e dividem as tasks
+      # topicos internos: onde o cluster guarda configs dos conectores, offsets do source e status (doc 07)
+      CONFIG_STORAGE_TOPIC: algashop_connect_configs
+      OFFSET_STORAGE_TOPIC: algashop_connect_offsets
+      STATUS_STORAGE_TOPIC: algashop_connect_statuses
+      # replicados nos 3 brokers: perder o topico de offsets = o source nao sabe onde parou
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 3
+      KAFKA_HEAP_OPTS: -Xms256m -Xmx768m # heap da JVM do worker, abaixo do limite do container
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 volumes:
   algashop-postgres:
   algashop-mongodb-1:
