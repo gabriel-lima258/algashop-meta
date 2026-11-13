@@ -12,6 +12,11 @@ services:
     command: --verbose --disable-http2-plain
   algashop-postgres:
     image: postgres:17-alpine
+    # wal_level=logical: o WAL passa a ter o suficiente para reconstruir as linhas alteradas,
+    # e e isso que o Debezium (Kafka Connect) le no CDC. Mudou o command? Recrie o container (up -d).
+    command: >
+      postgres
+      -c wal_level=logical
     deploy:
       resources:
         limits:
@@ -314,7 +319,7 @@ services:
   algashop-kafka-connect:
     image: quay.io/debezium/connect:3.7.0.Final
     ports:
-      - 8086:8083 # API REST no host: 8086 (a 8085 e a segunda instancia do notifications)
+      - 8087:8083 # API REST no host: 8087 (8086 e o insights; 8085, a segunda instancia do notifications)
     depends_on:
       - algashop-kafka-1
       - algashop-kafka-2
@@ -335,8 +340,29 @@ services:
       resources:
         limits:
           memory: 1G
+  # Reporting database do insights: um Postgres separado do dos servicos, para o relatorio pesado
+  # nao disputar CPU e memoria com o checkout. So o ETL (Kafka Connect) escreve; o insights so le.
+  algashop-insights-postgres:
+    image: postgres:17-alpine
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - 5434:5432 # 5433 ja e do algashop-postgres (bancos dos servicos)
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: insights
+    volumes:
+      - algashop-insights-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres -d insights
+      interval: 30s
+      timeout: 10s
+      retries: 3
 volumes:
   algashop-postgres:
+  algashop-insights-postgres:
   algashop-mongodb-1:
   algashop-mongodb-2:
   algashop-mongodb-3:
