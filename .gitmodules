@@ -46,3 +46,6 @@
 [submodule "microservices/notifications"]
 	path = microservices/notifications
 	url = https://github.com/gabriel-lima258/algashop-notifications.git
+[submodule "microservices/insights"]
+	path = microservices/insights
+	url = https://github.com/gabriel-lima258/algashop-insights.git
