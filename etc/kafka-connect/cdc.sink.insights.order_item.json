@@ -10,5 +10,8 @@
   "insert.mode": "upsert",
   "primary.key.mode": "record_key",
   "schema.evolution": "none",
-  "delete.enabled": "true"
+  "delete.enabled": "true",
+  "errors.tolerance": "all",
+  "errors.deadletterqueue.topic.name": "dlt.cdc.sink.insights.order_item",
+  "errors.deadletterqueue.context.headers.enable": "true"
 }
