@@ -10,5 +10,7 @@
   "insert.mode": "upsert",
   "primary.key.mode": "record_key",
   "schema.evolution": "none",
-  "quote.identifiers": "true"
+  "quote.identifiers": "true",
+  "delete.enabled": "true",
+  "field.exclude.list": "shipping_address_city,shipping_address_state"
 }

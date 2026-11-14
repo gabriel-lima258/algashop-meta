@@ -19,6 +19,7 @@
   "decimal.handling.mode": "precise",
   "transforms": "unwrap,rename",
   "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+  "transforms.unwrap.delete.tombstone.handling.mode": "tombstone",
   "transforms.rename.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
   "transforms.rename.renames": "shipping_address_city:shipping_city,shipping_address_state:shipping_state"
 }
