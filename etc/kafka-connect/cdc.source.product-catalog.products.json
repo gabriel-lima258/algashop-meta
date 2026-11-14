@@ -1,0 +1,22 @@
+{
+  "name": "cdc.source.product-catalog.products",
+  "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
+  "tasks.max": "1",
+  "mongodb.connection.string": "mongodb://algashop-mongodb-1:27017,algashop-mongodb-2:27017,algashop-mongodb-3:27017/?replicaSet=rs0",
+  "topic.prefix": "cdc",
+  "collection.include.list": "product_catalog.products",
+  "capture.mode": "change_streams_update_full",
+  "snapshot.mode": "initial",
+  "field.exclude.list": "product_catalog.products.description,product_catalog.products.images,product_catalog.products._class,product_catalog.products.createdByUserId,product_catalog.products.lastModifiedByUserId,product_catalog.products.version,product_catalog.products.mainImage._class",
+  "transforms": "unwrap,rename,uuidValue,uuidKey",
+  "transforms.unwrap.type": "io.debezium.connector.mongodb.transforms.ExtractNewDocumentState",
+  "transforms.unwrap.delete.tombstone.handling.mode": "tombstone",
+  "transforms.unwrap.flatten.struct": "true",
+  "transforms.unwrap.flatten.struct.delimiter": "_",
+  "transforms.rename.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+  "transforms.rename.renames": "_id:id,category__id:category_id,mainImage__id:mainImage_id",
+  "transforms.uuidValue.type": "com.algaworks.connect.transforms.BytesToUuid$Value",
+  "transforms.uuidValue.fields": "id,category_id,mainImage_id",
+  "transforms.uuidKey.type": "com.algaworks.connect.transforms.BytesToUuid$Key",
+  "transforms.uuidKey.fields": "id"
+}

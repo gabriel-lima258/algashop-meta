@@ -1,0 +1,18 @@
+{
+  "name": "cdc.sink.insights.product",
+  "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
+  "tasks.max": "1",
+  "connection.url": "jdbc:postgresql://algashop-insights-postgres:5432/insights?stringtype=unspecified",
+  "connection.username": "postgres",
+  "connection.password": "postgres",
+  "topics": "cdc.product_catalog.products",
+  "collection.name.format": "product",
+  "insert.mode": "upsert",
+  "primary.key.mode": "record_key",
+  "schema.evolution": "none",
+  "delete.enabled": "true",
+  "field.exclude.list": "category_enabled,discount_percentage_rounded,main_image_id,main_image_name",
+  "transforms": "snake",
+  "transforms.snake.type": "io.debezium.connector.jdbc.transforms.FieldNameTransformation",
+  "transforms.snake.column.naming.style": "snake_case"
+}

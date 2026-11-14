@@ -336,6 +336,9 @@ services:
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 3
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 3
       KAFKA_HEAP_OPTS: -Xms256m -Xmx768m # heap da JVM do worker, abaixo do limite do container
+    volumes:
+      # SMT que converte o UUID binário do MongoDB (etc/kafka-connect/uuid-smt)
+      - ./etc/kafka-connect/plugins/uuid-smt:/kafka/connect/uuid-smt:ro
     deploy:
       resources:
         limits:
