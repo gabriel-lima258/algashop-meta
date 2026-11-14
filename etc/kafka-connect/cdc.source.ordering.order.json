@@ -16,6 +16,11 @@
     "table.include.list": "public.order",
     "column.include.list": "public\\.order\\.(id|customer_id|status|total_amount|total_items|payment_method|placed_at|paid_at|ready_at|canceled_at|shipping_address_city|shipping_address_state)",
     "snapshot.mode": "initial",
-    "custom.metric.tags": "table=order"
+    "custom.metric.tags": "table=order",
+    "decimal.handling.mode": "precise",
+    "transforms": "unwrap,rename",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.rename.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.rename.renames": "shipping_address_city:shipping_city,shipping_address_state:shipping_state"
   }
 }
