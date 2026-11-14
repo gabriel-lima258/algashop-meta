@@ -360,6 +360,16 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+  algashop-kafka-connect-init:
+    image: curlimages/curl:8.23.0
+    restart: no
+    depends_on:
+      - algashop-kafka-connect
+    environment:
+      CONNECT_URL: http://algashop-kafka-connect:8083
+    volumes:
+      - ./etc/kafka-connect:/connectors:ro
+    entrypoint: [ "sh", "/connectors/apply-connectors.sh" ]
 volumes:
   algashop-postgres:
   algashop-insights-postgres:
