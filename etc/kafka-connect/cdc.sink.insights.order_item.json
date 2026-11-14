@@ -1,0 +1,14 @@
+{
+  "name": "cdc.sink.insights.order_item",
+  "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
+  "tasks.max": "1",
+  "connection.url": "jdbc:postgresql://algashop-insights-postgres:5432/insights",
+  "connection.username": "postgres",
+  "connection.password": "postgres",
+  "topics": "cdc.ordering.public.order_item",
+  "collection.name.format": "order_item",
+  "insert.mode": "upsert",
+  "primary.key.mode": "record_key",
+  "schema.evolution": "none",
+  "delete.enabled": "true"
+}
