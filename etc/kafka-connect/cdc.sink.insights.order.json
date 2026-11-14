@@ -12,5 +12,8 @@
   "schema.evolution": "none",
   "quote.identifiers": "true",
   "delete.enabled": "true",
-  "field.exclude.list": "shipping_address_city,shipping_address_state"
+  "field.exclude.list": "shipping_address_city,shipping_address_state",
+  "errors.tolerance": "all",
+  "errors.deadletterqueue.topic.name": "dlt.cdc.sink.insights.order",
+  "errors.deadletterqueue.context.headers.enable": "true"
 }

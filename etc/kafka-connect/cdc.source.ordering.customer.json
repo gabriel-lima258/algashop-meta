@@ -1,0 +1,22 @@
+{
+  "name": "cdc.source.ordering.customer",
+  "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+  "tasks.max": "1",
+  "database.hostname": "algashop-postgres",
+  "database.port": "5432",
+  "database.user": "postgres",
+  "database.password": "postgres",
+  "database.dbname": "ordering",
+  "topic.prefix": "cdc.ordering",
+  "plugin.name": "pgoutput",
+  "slot.name": "cdc_ordering_customer",
+  "publication.name": "cdc_ordering_customer",
+  "publication.autocreate.mode": "filtered",
+  "table.include.list": "public.customer",
+  "column.include.list": "public\\.customer\\.(id|birth_date|registered_at|loyalty_points|promotion_notifications_allowed|address_city|address_state|archived|archived_at)",
+  "snapshot.mode": "initial",
+  "custom.metric.tags": "table=customer",
+  "transforms": "unwrap",
+  "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+  "transforms.unwrap.delete.tombstone.handling.mode": "tombstone"
+}
