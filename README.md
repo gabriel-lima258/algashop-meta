@@ -96,6 +96,7 @@ docker compose -f docker-compose.tools.yml up -d
 | FastPay | **9995** | gateway de pagamento simulado |
 | Kafka (3 brokers) | **9092-9094** | cluster KRaft de 3 nós — eventos de integração entre os serviços |
 | Kafka UI | **9084** | tópicos, partições, offsets e consumer lag |
+| Metabase | **3000** | dashboards sobre o reporting database (`insights`) |
 
 E as portas dos serviços, quando você os sobe:
 

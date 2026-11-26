@@ -358,6 +358,8 @@ services:
       POSTGRES_DB: insights
     volumes:
       - algashop-insights-postgres:/var/lib/postgresql/data
+      - ./etc/postgres/init-insights-db.sh:/docker-entrypoint-initdb.d/init-insights-db.sh
+      - ./etc/postgres/metabase-readonly-user.sql:/etc/postgres/metabase-readonly-user.sql
     healthcheck:
       test: pg_isready -U postgres -d insights
       interval: 30s
@@ -373,6 +375,36 @@ services:
     volumes:
       - ./etc/kafka-connect:/connectors:ro
     entrypoint: [ "sh", "/connectors/apply-connectors.sh" ]
+  # Metabase: dashboards sobre o reporting database, em http://localhost:3000.
+  # Dois bancos no mesmo Postgres, com papeis diferentes:
+  #   metabase -> o estado do PROPRIO Metabase (usuarios, perguntas, dashboards) - MB_DB_* abaixo
+  #   insights -> os dados dos relatorios; lido pela fonte cadastrada na UI com o
+  #               usuario metabase_reader (somente leitura, ver etc/postgres)
+  algashop-metabase:
+    image: metabase/metabase:v0.64.2.7
+    ports:
+      - 3000:3000
+    depends_on:
+      algashop-insights-postgres:
+        condition: service_healthy
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: postgres
+      MB_DB_PASS: postgres
+      MB_DB_HOST: algashop-insights-postgres
+      JAVA_OPTS: -Xmx768m
+    healthcheck:
+      test: curl --fail --silent http://localhost:3000/api/health || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
 volumes:
   algashop-postgres:
   algashop-insights-postgres:
