@@ -58,3 +58,6 @@ name,type,value
 /config/algashop/gateway-ecommerce/redis/database,String,3
 /config/algashop/gateway-ecommerce/httpclient/connect-timeout,String,1000
 /config/algashop/gateway-ecommerce/httpclient/response-timeout,String,60000
+/config/algashop/kafka-connect/ordering-database/hostname,String,algashop-postgres
+/config/algashop/kafka-connect/ordering-database/port,String,5432
+/config/algashop/kafka-connect/insights-database/connection-url,String,jdbc:postgresql://algashop-insights-postgres:5432/insights

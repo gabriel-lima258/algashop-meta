@@ -185,15 +185,14 @@ services:
       LS_SECRET_ACCESS_KEY: test
       LS_REGION: us-east-1
     healthcheck:
-      # /_localstack/init/ready so devolve "completed": true depois que os scripts de
-      # ready.d (init-aws.sh: parametros, secrets, bucket) terminaram. Sem isso, healthy
-      # significava apenas "porta aberta" e os servicos corriam contra o seed - o
-      # product-catalog chegou a subir antes do secret do redis existir.
-      test: ["CMD-SHELL", "curl -s http://localhost:4566/_localstack/init/ready | grep -q '\"completed\": true'"]
+      # healthy = segredos e parametros JA cadastrados, e nao so "porta aberta". O init-aws.sh cria
+      # /run/algashop/ready quando todos os cadastros dao certo (0 falhas); o tmpfs abaixo faz esse
+      # arquivo sumir a cada start, entao um container recriado nunca nasce "pronto" por engano.
+      test: [ "CMD-SHELL", "test -f /run/algashop/ready && curl -sf http://localhost:4566/_localstack/health" ]
       interval: 5s
-      timeout: 10s
-      start_period: 60s
-      retries: 20
+      timeout: 3s
+      retries: 30
+      start_period: 30s
     volumes:
       # ready.d: tudo que estiver aqui roda automaticamente quando os servicos ficam
       # prontos. E o que cria o bucket, aplica o CORS e carrega as imagens de exemplo,
@@ -201,6 +200,8 @@ services:
       - ./etc/aws/init.sh:/etc/localstack/init/ready.d/init-aws.sh
       - ./etc/aws:/etc/aws
       - ./etc/images:/etc/images
+    tmpfs:
+      - /run/algashop # memoria: o arquivo de pronto nao sobrevive a um restart
     deploy:
       resources:
         limits:
@@ -321,9 +322,14 @@ services:
     ports:
       - 8087:8083 # API REST no host: 8087 (8086 e o insights; 8085, a segunda instancia do notifications)
     depends_on:
-      - algashop-kafka-1
-      - algashop-kafka-2
-      - algashop-kafka-3
+      algashop-kafka-1:
+        condition: service_started
+      algashop-kafka-2:
+        condition: service_started
+      algashop-kafka-3:
+        condition: service_started
+      algashop-localstack:
+        condition: service_healthy # os config providers leem SSM e Secrets Manager ao iniciar as tasks
     environment:
       BOOTSTRAP_SERVERS: algashop-kafka-1:9081,algashop-kafka-2:9082,algashop-kafka-3:9083 # listeners internos dos brokers
       GROUP_ID: algashop-kafka-connect # modo distribuido: workers com o mesmo id formam um cluster e dividem as tasks
@@ -336,9 +342,24 @@ services:
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 3
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 3
       KAFKA_HEAP_OPTS: -Xms256m -Xmx768m # heap da JVM do worker, abaixo do limite do container
+      # Config providers (plugin MSK em plugins/aws-config-providers): o worker troca, ao iniciar cada task,
+      # ${ssm::<parametro>} pelo Parameter Store e ${secretsmanager:<segredo>:<chave>} pelo Secrets Manager.
+      # O JSON do conector (e o GET /connectors/{nome}/config) so guarda o ${...}, nunca a senha.
+      CONNECT_CONFIG_PROVIDERS: secretsmanager,ssm
+      CONNECT_CONFIG_PROVIDERS_SECRETSMANAGER_CLASS: com.amazonaws.kafka.config.providers.SecretsManagerConfigProvider
+      CONNECT_CONFIG_PROVIDERS_SECRETSMANAGER_PARAM_REGION: us-east-1
+      CONNECT_CONFIG_PROVIDERS_SECRETSMANAGER_PARAM_ENDPOINT: http://algashop-localstack:4566
+      CONNECT_CONFIG_PROVIDERS_SSM_CLASS: com.amazonaws.kafka.config.providers.SsmParamStoreConfigProvider
+      CONNECT_CONFIG_PROVIDERS_SSM_PARAM_REGION: us-east-1
+      CONNECT_CONFIG_PROVIDERS_SSM_PARAM_ENDPOINT: http://algashop-localstack:4566
+      # A MESMA chave do LS_ACCESS_KEY_ID do localstack: no LocalStack cada chave enxerga a sua conta, e o
+      # init-aws.sh cadastra com esta. Com "test" (outra conta) os providers nao acham nada e os conectores falham.
+      AWS_ACCESS_KEY_ID: LSIAQAAAAAAVNCBMPNSG
+      AWS_SECRET_ACCESS_KEY: test
     volumes:
       # SMT que converte o UUID binário do MongoDB (etc/kafka-connect/uuid-smt)
       - ./etc/kafka-connect/plugins/uuid-smt:/kafka/connect/uuid-smt:ro
+      - ./etc/kafka-connect/plugins/aws-config-providers:/kafka/connect/aws-config-providers:ro # config providers do MSK
     deploy:
       resources:
         limits:
@@ -369,7 +390,10 @@ services:
     image: curlimages/curl:8.23.0
     restart: no
     depends_on:
-      - algashop-kafka-connect
+      algashop-kafka-connect:
+        condition: service_started
+      algashop-localstack:
+        condition: service_healthy
     environment:
       CONNECT_URL: http://algashop-kafka-connect:8083
     volumes:
