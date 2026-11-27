@@ -162,6 +162,22 @@ services:
           memory: 512M
     environment:
       SPRING_PROFILES_ACTIVE: docker
+  algashop-insights:
+    image: gabriel58221/insights:dev
+    restart: no
+    ports:
+      - 8086:8086
+    depends_on:
+      algashop-localstack:
+        condition: service_healthy
+      algashop-insights-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
   algashop-service-registry:
     image: gabriel58221/service-registry:dev
     restart: no

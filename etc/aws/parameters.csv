@@ -47,6 +47,12 @@ name,type,value
 /config/algashop/product-catalog/storage/s3/bucket-name,String,algashop-product-image
 /config/algashop/product-catalog/data-load/enabled,String,true
 /config/algashop/product-catalog/data-load/auto-drop,String,true
+/config/algashop/insights/datasource/url,String,jdbc:postgresql://localhost:5434/insights
+/config/algashop/notifications/datasource/url,String,jdbc:postgresql://localhost:5433/notifications
+/config/algashop/notifications/jpa/show-sql,String,true
+/config/algashop/notifications/mail/host,String,localhost
+/config/algashop/notifications/mail/port,String,1025
+/config/algashop/notifications/mail/from,String,no-reply@algashop.local
 /config/algashop/gateway-admin/redis/host,String,algashop-redis
 /config/algashop/gateway-admin/redis/port,String,6379
 /config/algashop/gateway-admin/redis/database,String,5
